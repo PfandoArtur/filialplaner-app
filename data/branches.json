@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "Title": "Filiale Berlin",
+    "created": "2025-01-01T09:00:00Z",
+    "modified": "2025-01-01T09:00:00Z"
+  },
+  {
+    "id": "2",
+    "Title": "Filiale Hamburg", 
+    "created": "2025-01-01T09:30:00Z",
+    "modified": "2025-01-01T09:30:00Z"
+  },
+  {
+    "id": "3",
+    "Title": "Filiale München",
+    "created": "2025-01-01T10:00:00Z",
+    "modified": "2025-01-01T10:00:00Z" 
+  }
+]

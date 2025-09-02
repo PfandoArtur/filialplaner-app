@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "Mitarbeiter": "Max Mustermann",
+    "created": "2025-01-01T10:00:00Z",
+    "modified": "2025-01-01T10:00:00Z"
+  },
+  {
+    "id": "2", 
+    "Mitarbeiter": "Anna Schmidt",
+    "created": "2025-01-01T10:30:00Z",
+    "modified": "2025-01-01T10:30:00Z"
+  },
+  {
+    "id": "3",
+    "Mitarbeiter": "Tom Weber",
+    "created": "2025-01-01T11:00:00Z", 
+    "modified": "2025-01-01T11:00:00Z"
+  }
+]
