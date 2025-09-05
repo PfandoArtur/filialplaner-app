@@ -241,7 +241,7 @@ export const DayCell: React.FC<DayCellProps> = ({
 
       {/* Comment Popup */}
       {showComment && (
-        <div className="absolute top-12 left-0 right-0 z-20 bg-white border border-gray-300 rounded shadow-lg p-2">
+        <div className="absolute top-0 left-full ml-2 z-20 bg-white border border-gray-300 rounded shadow-lg p-2 w-48">
           <textarea
             ref={commentRef}
             value={tempComment}
