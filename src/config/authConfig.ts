@@ -4,11 +4,14 @@ export const msalConfig: Configuration = {
     auth: {
         clientId: "f7cd8eaa-36ec-481a-9ab5-4ba531a38bcf", // Filialplaner App Registration Client ID
         authority: "https://login.microsoftonline.com/f29e081c-4b24-4fc6-970d-9319194a7af5", // Ihre spezifische Tenant ID
-        redirectUri: "https://pfandoartur.github.io/filialplaner-app", // GitHub Pages URL
+        redirectUri: window.location.origin, // Dynamische URI für Teams/Browser
     },
     cache: {
-        cacheLocation: "sessionStorage", // Kann auch "localStorage" sein
-        storeAuthStateInCookie: false, // Bei IE/Edge auf true setzen
+        cacheLocation: "sessionStorage", // Für Teams besser sessionStorage
+        storeAuthStateInCookie: true, // Wichtig für Teams-Umgebung
+    },
+    system: {
+        allowNativeBroker: false, // Deaktiviert für Teams
     }
 };
 

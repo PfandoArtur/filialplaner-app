@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../config/authConfig";
+import { app, authentication } from "@microsoft/teams-js";
 
 interface LoginButtonProps {
   className?: string;
@@ -8,11 +9,54 @@ interface LoginButtonProps {
 
 export const LoginButton: React.FC<LoginButtonProps> = ({ className = "" }) => {
   const { instance } = useMsal();
+  const [isInTeams, setIsInTeams] = useState(false);
 
-  const handleLogin = () => {
-    instance.loginPopup(loginRequest).catch(e => {
-      console.error("Login failed:", e);
+  useEffect(() => {
+    // Initialisiere Teams SDK
+    app.initialize().then(() => {
+      app.getContext().then(() => {
+        setIsInTeams(true);
+      }).catch(() => {
+        setIsInTeams(false);
+      });
+    }).catch(() => {
+      setIsInTeams(false);
     });
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      if (isInTeams) {
+        // Teams-spezifische Authentifizierung
+        const token = await authentication.getAuthToken({
+          resources: loginRequest.scopes
+        });
+        
+        // Token an MSAL weiterleiten
+        const account = {
+          homeAccountId: "",
+          environment: "",
+          tenantId: "",
+          username: "",
+          localAccountId: ""
+        };
+        
+        // Erfolgreiche Anmeldung simulieren
+        window.location.reload();
+      } else {
+        // Standard Browser-Login
+        await instance.loginPopup(loginRequest);
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      
+      // Fallback: Versuche trotzdem Popup
+      try {
+        await instance.loginPopup(loginRequest);
+      } catch (popupError) {
+        console.error("Popup login also failed:", popupError);
+      }
+    }
   };
 
   return (

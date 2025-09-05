@@ -1,8 +1,8 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.16/MicrosoftTeams.schema.json",
   "manifestVersion": "1.16",
-  "version": "1.0.0",
-  "id": "filialplaner-teams-app",
+  "version": "1.0.1",
+  "id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
   "packageName": "com.pfandoscashanddrive.filialplaner",
   "developer": {
     "name": "Pfandos Cash and Drive GmbH",
