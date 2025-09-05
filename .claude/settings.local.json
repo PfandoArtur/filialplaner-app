@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(powershell Compress-Archive:*)",
+      "Bash(dir:*)",
+      "Read(c:\\Users\\Artur Illenseer.Pfando\\Downloads/**)",
+      "Bash(powershell:*)",
+      "Read(c:\\Users\\Artur Illenseer.Pfando\\Downloads/**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

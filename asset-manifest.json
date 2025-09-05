@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/filialplaner-app/static/css/main.13f91016.css",
+    "main.js": "/filialplaner-app/static/js/main.9bfccbac.js",
+    "index.html": "/filialplaner-app/index.html",
+    "main.13f91016.css.map": "/filialplaner-app/static/css/main.13f91016.css.map",
+    "main.9bfccbac.js.map": "/filialplaner-app/static/js/main.9bfccbac.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.13f91016.css",
+    "static/js/main.9bfccbac.js"
+  ]
+}
