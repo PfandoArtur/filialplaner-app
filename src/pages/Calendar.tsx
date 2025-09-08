@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Header } from '../components/Header';
 import { NotesSection } from '../components/NotesSection';
 import { CalendarGrid } from '../components/CalendarGrid';
-import { dummyEmployees, dummyBranches, CellData, NoteEntry } from '../data/dummyData';
+import { dummyEmployees, dummyBranches, CellData, NoteEntry, Employee, Branch, transformSharePointBranch, transformSharePointEmployee } from '../data/dummyData';
+import { sharePointService } from '../services/sharePointService';
 
 interface WeekData {
   weekNumber: number;
@@ -30,6 +31,47 @@ export const Calendar: React.FC = () => {
 
   // State für Kalenderdaten
   const [calendarData, setCalendarData] = useState<CalendarData>({});
+
+  // State für SharePoint-Daten
+  const [employees, setEmployees] = useState<Employee[]>(dummyEmployees);
+  const [branches, setBranches] = useState<Branch[]>(dummyBranches);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dataSource, setDataSource] = useState<'dummy' | 'sharepoint'>('dummy');
+
+  // SharePoint-Daten laden
+  useEffect(() => {
+    const loadSharePointData = async () => {
+      try {
+        setIsLoading(true);
+        console.log('Loading SharePoint data...');
+        
+        const [spBranches, spEmployees] = await Promise.all([
+          sharePointService.getBranches(),
+          sharePointService.getEmployees()
+        ]);
+
+        const transformedBranches = spBranches.map(transformSharePointBranch);
+        const transformedEmployees = spEmployees.map(transformSharePointEmployee);
+
+        setBranches(transformedBranches);
+        setEmployees(transformedEmployees);
+        setDataSource('sharepoint');
+        
+        console.log('SharePoint data loaded:', { 
+          branches: transformedBranches.length, 
+          employees: transformedEmployees.length 
+        });
+      } catch (error) {
+        console.error('Failed to load SharePoint data, using dummy data:', error);
+        // Dummy-Daten sind bereits als Default gesetzt
+        setDataSource('dummy');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSharePointData();
+  }, []);
 
   // Helper Funktionen
   function getCurrentWeek(): WeekData {
@@ -169,6 +211,17 @@ export const Calendar: React.FC = () => {
     setNotesWeek2(newNotes);
   }, []);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">SharePoint-Daten werden geladen...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
@@ -179,8 +232,14 @@ export const Calendar: React.FC = () => {
         onJumpToWeek={handleJumpToWeek}
       />
 
+      {/* Data Source Indicator */}
+      <div className="px-4 py-1 bg-gray-100 text-xs text-gray-600 border-b">
+        Datenquelle: {dataSource === 'sharepoint' ? 'SharePoint' : 'Dummy-Daten'} 
+        ({branches.length} Filialen, {employees.length} Mitarbeiter)
+      </div>
+
       <NotesSection
-        employees={dummyEmployees}
+        employees={employees}
         notesWeek1={notesWeek1}
         notesWeek2={notesWeek2}
         onNotesWeek1Change={handleNotesWeek1Change}
@@ -190,8 +249,8 @@ export const Calendar: React.FC = () => {
       />
 
       <CalendarGrid
-        employees={dummyEmployees}
-        branches={dummyBranches}
+        employees={employees}
+        branches={branches}
         calendarData={calendarData}
         week1Days={currentWeeks[0].days}
         week2Days={currentWeeks[1].days}

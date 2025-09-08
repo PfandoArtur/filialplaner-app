@@ -8,6 +8,17 @@ export interface Branch {
   name: string;
 }
 
+// Transformations-Funktionen für SharePoint-Daten
+export const transformSharePointBranch = (spBranch: any): Branch => ({
+  id: spBranch.Id.toString(),
+  name: spBranch.Title
+});
+
+export const transformSharePointEmployee = (spEmployee: any): Employee => ({
+  id: spEmployee.Id.toString(),
+  name: spEmployee.Name
+});
+
 export const dummyEmployees: Employee[] = [
   { id: '1', name: 'Max Mustermann' },
   { id: '2', name: 'Anna Schmidt' },
