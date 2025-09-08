@@ -4,6 +4,7 @@ import { NotesSection } from '../components/NotesSection';
 import { CalendarGrid } from '../components/CalendarGrid';
 import { dummyEmployees, dummyBranches, CellData, NoteEntry, Employee, Branch, transformSharePointBranch, transformSharePointEmployee } from '../data/dummyData';
 import { sharePointService } from '../services/sharePointService';
+import { APP_VERSION, BUILD_DATE } from '../config/version';
 
 interface WeekData {
   weekNumber: number;
@@ -245,22 +246,28 @@ export const Calendar: React.FC = () => {
       />
 
       {/* Data Source Indicator */}
-      <div className={`px-4 py-1 text-xs border-b ${
+      <div className={`px-4 py-1 text-xs border-b flex justify-between items-start ${
         dataSource === 'sharepoint' ? 'bg-green-100 text-green-800' :
         dataSource === 'no-teams' ? 'bg-yellow-100 text-yellow-800' :
         'bg-gray-100 text-gray-600'
       }`}>
-        Datenquelle: {
-          dataSource === 'sharepoint' ? 'SharePoint (Live-Daten)' :
-          dataSource === 'no-teams' ? 'Dummy-Daten (Teams erforderlich)' :
-          'Dummy-Daten (SharePoint-Fehler)'
-        } 
-        ({branches.length} Filialen, {employees.length} Mitarbeiter)
-        {errorMessage && (
-          <div className="mt-1 text-xs opacity-75">
-            {errorMessage}
-          </div>
-        )}
+        <div className="flex-1">
+          Datenquelle: {
+            dataSource === 'sharepoint' ? 'SharePoint (Live-Daten)' :
+            dataSource === 'no-teams' ? 'Dummy-Daten (Teams erforderlich)' :
+            'Dummy-Daten (SharePoint-Fehler)'
+          } 
+          ({branches.length} Filialen, {employees.length} Mitarbeiter)
+          {errorMessage && (
+            <div className="mt-1 text-xs opacity-75">
+              {errorMessage}
+            </div>
+          )}
+        </div>
+        <div className="text-right text-xs opacity-75 ml-4 flex-shrink-0">
+          <div>{APP_VERSION}</div>
+          <div className="text-[10px]">{BUILD_DATE}</div>
+        </div>
       </div>
 
       <NotesSection
