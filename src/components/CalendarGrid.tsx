@@ -132,7 +132,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
               <div 
                 key={`${branch.id}-week1-${dayIndex}`}
                 className={dayIndex === 5 ? 'border-r-2' : ''}
-                style={dayIndex === 5 ? { borderRightColor: '#3B82F6', width: '100%', maxWidth: '100%', minWidth: 0, overflow: 'hidden' } : { width: '100%', maxWidth: '100%', minWidth: 0, overflow: 'hidden' }}
+                style={dayIndex === 5 ? { borderRightColor: '#3B82F6', width: '100%', maxWidth: '100%', minWidth: 0, overflow: 'visible' } : { width: '100%', maxWidth: '100%', minWidth: 0, overflow: 'visible' }}
               >
                 <DayCell
                   branchId={branch.id}
@@ -152,7 +152,7 @@ export const CalendarGrid: React.FC<CalendarGridProps> = ({
             {week2Days.map((day, dayIndex) => (
               <div 
                 key={`${branch.id}-week2-${dayIndex}`}
-                style={{ width: '100%', maxWidth: '100%', minWidth: 0, overflow: 'hidden' }}
+                style={{ width: '100%', maxWidth: '100%', minWidth: 0, overflow: 'visible' }}
               >
                 <DayCell
                   branchId={branch.id}

@@ -151,8 +151,8 @@ export const DayCell: React.FC<DayCellProps> = ({
 
   return (
     <div 
-      className="h-20 border-r border-gray-300 border-b border-gray-200 p-1 relative overflow-hidden bg-white"
-      style={{ backgroundColor, width: '100%', maxWidth: '100%', minWidth: 0 }}
+      className="h-20 border-r border-gray-300 border-b border-gray-200 p-1 relative bg-white"
+      style={{ backgroundColor, width: '100%', maxWidth: '100%', minWidth: 0, overflow: showComment ? 'visible' : 'hidden' }}
     >
       {/* Employee Dropdown and Status/Comment Buttons */}
       <div className="mb-1 flex items-start gap-1 w-full">
@@ -241,7 +241,10 @@ export const DayCell: React.FC<DayCellProps> = ({
 
       {/* Comment Popup */}
       {showComment && (
-        <div className="absolute top-0 left-full ml-2 z-20 bg-white border border-gray-300 rounded shadow-lg p-2 w-48">
+        <div 
+          className="absolute top-0 left-full ml-2 bg-white border border-gray-300 rounded shadow-lg p-3 min-w-[200px]" 
+          style={{ zIndex: 1000 }}
+        >
           <textarea
             ref={commentRef}
             value={tempComment}
