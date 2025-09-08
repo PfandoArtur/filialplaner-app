@@ -36,7 +36,8 @@ export const Calendar: React.FC = () => {
   const [employees, setEmployees] = useState<Employee[]>(dummyEmployees);
   const [branches, setBranches] = useState<Branch[]>(dummyBranches);
   const [isLoading, setIsLoading] = useState(true);
-  const [dataSource, setDataSource] = useState<'dummy' | 'sharepoint'>('dummy');
+  const [dataSource, setDataSource] = useState<'dummy' | 'sharepoint' | 'no-teams'>('dummy');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   // SharePoint-Daten laden
   useEffect(() => {
@@ -63,8 +64,19 @@ export const Calendar: React.FC = () => {
         });
       } catch (error) {
         console.error('Failed to load SharePoint data, using dummy data:', error);
-        // Dummy-Daten sind bereits als Default gesetzt
-        setDataSource('dummy');
+        
+        if (error instanceof Error) {
+          if (error.message.includes('Not in Teams context')) {
+            setDataSource('no-teams');
+            setErrorMessage('Diese App muss in Microsoft Teams geöffnet werden für SharePoint-Zugriff');
+          } else {
+            setDataSource('dummy');
+            setErrorMessage(error.message);
+          }
+        } else {
+          setDataSource('dummy');
+          setErrorMessage('Unbekannter Fehler beim Laden der SharePoint-Daten');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -233,9 +245,22 @@ export const Calendar: React.FC = () => {
       />
 
       {/* Data Source Indicator */}
-      <div className="px-4 py-1 bg-gray-100 text-xs text-gray-600 border-b">
-        Datenquelle: {dataSource === 'sharepoint' ? 'SharePoint' : 'Dummy-Daten'} 
+      <div className={`px-4 py-1 text-xs border-b ${
+        dataSource === 'sharepoint' ? 'bg-green-100 text-green-800' :
+        dataSource === 'no-teams' ? 'bg-yellow-100 text-yellow-800' :
+        'bg-gray-100 text-gray-600'
+      }`}>
+        Datenquelle: {
+          dataSource === 'sharepoint' ? 'SharePoint (Live-Daten)' :
+          dataSource === 'no-teams' ? 'Dummy-Daten (Teams erforderlich)' :
+          'Dummy-Daten (SharePoint-Fehler)'
+        } 
         ({branches.length} Filialen, {employees.length} Mitarbeiter)
+        {errorMessage && (
+          <div className="mt-1 text-xs opacity-75">
+            {errorMessage}
+          </div>
+        )}
       </div>
 
       <NotesSection

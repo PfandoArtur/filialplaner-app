@@ -14,9 +14,30 @@ class SharePointService {
   private graphBaseUrl = 'https://graph.microsoft.com/v1.0';
   private siteId = 'pfandoscashanddrivegmbh.sharepoint.com:/sites/MyPfando';
   private isInitialized = false;
+  private isInTeams = false;
+  
+  private isTeamsContext(): boolean {
+    // Prüfe ob wir in Teams-Umgebung sind
+    return !!(
+      window.parent !== window || 
+      window.location.href.includes('teams.microsoft.com') ||
+      window.location.href.includes('teams.live.com') ||
+      document.referrer.includes('teams.microsoft.com') ||
+      navigator.userAgent.includes('Teams')
+    );
+  }
   
   private async initializeTeams(): Promise<void> {
     if (this.isInitialized) return;
+    
+    this.isInTeams = this.isTeamsContext();
+    console.log('Teams context detected:', this.isInTeams);
+    
+    if (!this.isInTeams) {
+      this.isInitialized = true;
+      console.log('Not in Teams context, skipping Teams SDK initialization');
+      return;
+    }
     
     try {
       await app.initialize();
@@ -25,14 +46,21 @@ class SharePointService {
       console.log('Teams SDK initialized successfully');
     } catch (error) {
       console.error('Failed to initialize Teams SDK:', error);
-      throw new Error('Teams initialization failed');
+      this.isInTeams = false;
+      this.isInitialized = true;
+      console.log('Falling back to non-Teams mode');
     }
   }
   
   private async getAccessToken(): Promise<string> {
     try {
-      // Erst Teams SDK initialisieren
+      // Erst Teams-Kontext prüfen und initialisieren
       await this.initializeTeams();
+      
+      if (!this.isInTeams) {
+        console.log('Not in Teams context, cannot get access token');
+        throw new Error('Not in Teams context');
+      }
       
       // Teams SSO Token für Graph API
       const token = await authentication.getAuthToken({
