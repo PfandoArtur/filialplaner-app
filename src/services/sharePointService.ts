@@ -1,4 +1,4 @@
-import { authentication } from "@microsoft/teams-js";
+import { app, authentication } from "@microsoft/teams-js";
 
 export interface SharePointBranch {
   Id: number;
@@ -13,9 +13,27 @@ export interface SharePointEmployee {
 class SharePointService {
   private graphBaseUrl = 'https://graph.microsoft.com/v1.0';
   private siteId = 'pfandoscashanddrivegmbh.sharepoint.com:/sites/MyPfando';
+  private isInitialized = false;
+  
+  private async initializeTeams(): Promise<void> {
+    if (this.isInitialized) return;
+    
+    try {
+      await app.initialize();
+      await app.getContext();
+      this.isInitialized = true;
+      console.log('Teams SDK initialized successfully');
+    } catch (error) {
+      console.error('Failed to initialize Teams SDK:', error);
+      throw new Error('Teams initialization failed');
+    }
+  }
   
   private async getAccessToken(): Promise<string> {
     try {
+      // Erst Teams SDK initialisieren
+      await this.initializeTeams();
+      
       // Teams SSO Token für Graph API
       const token = await authentication.getAuthToken({
         resources: ['https://graph.microsoft.com']
