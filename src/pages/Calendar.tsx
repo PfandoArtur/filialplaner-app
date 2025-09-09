@@ -6,7 +6,7 @@ import { dummyEmployees, dummyBranches, CellData, NoteEntry, Employee, Branch } 
 import { GraphService } from '../services/graphService';
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from '../config/authConfig';
-import { APP_VERSION, BUILD_DATE } from '../config/version';
+import { APP_VERSION, BUILD_DATE, CACHE_BUSTER } from '../config/version';
 
 interface WeekData {
   weekNumber: number;
@@ -295,6 +295,7 @@ export const Calendar: React.FC = () => {
         <div className="text-right text-xs opacity-75 ml-4 flex-shrink-0">
           <div>{APP_VERSION}</div>
           <div className="text-[10px]">{BUILD_DATE}</div>
+          <div className="text-[8px] opacity-50">#{CACHE_BUSTER}</div>
         </div>
       </div>
 
