@@ -2,8 +2,10 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Header } from '../components/Header';
 import { NotesSection } from '../components/NotesSection';
 import { CalendarGrid } from '../components/CalendarGrid';
-import { dummyEmployees, dummyBranches, CellData, NoteEntry, Employee, Branch, transformSharePointBranch, transformSharePointEmployee } from '../data/dummyData';
-import { sharePointService } from '../services/sharePointService';
+import { dummyEmployees, dummyBranches, CellData, NoteEntry, Employee, Branch } from '../data/dummyData';
+import { GraphService } from '../services/graphService';
+import { useMsal } from "@azure/msal-react";
+import { loginRequest } from '../config/authConfig';
 import { APP_VERSION, BUILD_DATE } from '../config/version';
 
 interface WeekData {
@@ -33,27 +35,53 @@ export const Calendar: React.FC = () => {
   // State für Kalenderdaten
   const [calendarData, setCalendarData] = useState<CalendarData>({});
 
+  // MSAL für SharePoint-Zugriff
+  const { instance, accounts } = useMsal();
+  
   // State für SharePoint-Daten
   const [employees, setEmployees] = useState<Employee[]>(dummyEmployees);
   const [branches, setBranches] = useState<Branch[]>(dummyBranches);
   const [isLoading, setIsLoading] = useState(true);
-  const [dataSource, setDataSource] = useState<'dummy' | 'sharepoint' | 'no-teams'>('dummy');
+  const [dataSource, setDataSource] = useState<'dummy' | 'sharepoint' | 'error'>('dummy');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  // SharePoint-Daten laden
+  // SharePoint-Daten laden mit MSAL
   useEffect(() => {
     const loadSharePointData = async () => {
       try {
         setIsLoading(true);
-        console.log('Loading SharePoint data...');
+        console.log('Loading SharePoint data with MSAL...');
         
+        // MSAL Token abrufen
+        const activeAccount = accounts[0];
+        if (!activeAccount) {
+          throw new Error('Kein aktiver Account gefunden');
+        }
+
+        const silentRequest = {
+          ...loginRequest,
+          account: activeAccount
+        };
+
+        const response = await instance.acquireTokenSilent(silentRequest);
+        const graphService = new GraphService(response.accessToken);
+        
+        // SharePoint-Daten abrufen
         const [spBranches, spEmployees] = await Promise.all([
-          sharePointService.getBranches(),
-          sharePointService.getEmployees()
+          graphService.getBranches(),
+          graphService.getEmployees()
         ]);
 
-        const transformedBranches = spBranches.map(transformSharePointBranch);
-        const transformedEmployees = spEmployees.map(transformSharePointEmployee);
+        // Transform SharePoint data to match local interface
+        const transformedBranches = spBranches.map(branch => ({
+          id: branch.id,
+          name: branch.Title
+        }));
+        
+        const transformedEmployees = spEmployees.map(employee => ({
+          id: employee.id,
+          name: employee.Mitarbeiter
+        }));
 
         setBranches(transformedBranches);
         setEmployees(transformedEmployees);
@@ -66,16 +94,10 @@ export const Calendar: React.FC = () => {
       } catch (error) {
         console.error('Failed to load SharePoint data, using dummy data:', error);
         
+        setDataSource('error');
         if (error instanceof Error) {
-          if (error.message.includes('Not in Teams context')) {
-            setDataSource('no-teams');
-            setErrorMessage('Diese App muss in Microsoft Teams geöffnet werden für SharePoint-Zugriff');
-          } else {
-            setDataSource('dummy');
-            setErrorMessage(error.message);
-          }
+          setErrorMessage(`SharePoint-Fehler: ${error.message}`);
         } else {
-          setDataSource('dummy');
           setErrorMessage('Unbekannter Fehler beim Laden der SharePoint-Daten');
         }
       } finally {
@@ -83,8 +105,14 @@ export const Calendar: React.FC = () => {
       }
     };
 
-    loadSharePointData();
-  }, []);
+    if (accounts.length > 0) {
+      loadSharePointData();
+    } else {
+      setIsLoading(false);
+      setDataSource('error');
+      setErrorMessage('Kein Microsoft-Account angemeldet');
+    }
+  }, [instance, accounts]);
 
   // Helper Funktionen
   function getCurrentWeek(): WeekData {
@@ -248,14 +276,14 @@ export const Calendar: React.FC = () => {
       {/* Data Source Indicator */}
       <div className={`px-4 py-1 text-xs border-b flex justify-between items-start ${
         dataSource === 'sharepoint' ? 'bg-green-100 text-green-800' :
-        dataSource === 'no-teams' ? 'bg-yellow-100 text-yellow-800' :
+        dataSource === 'error' ? 'bg-red-100 text-red-800' :
         'bg-gray-100 text-gray-600'
       }`}>
         <div className="flex-1">
           Datenquelle: {
             dataSource === 'sharepoint' ? 'SharePoint (Live-Daten)' :
-            dataSource === 'no-teams' ? 'Dummy-Daten (Teams erforderlich)' :
-            'Dummy-Daten (SharePoint-Fehler)'
+            dataSource === 'error' ? 'Dummy-Daten (SharePoint-Fehler)' :
+            'Dummy-Daten'
           } 
           ({branches.length} Filialen, {employees.length} Mitarbeiter)
           {errorMessage && (
