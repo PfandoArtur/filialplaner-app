@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/filialplaner-app/static/css/main.06c9089d.css",
-    "main.js": "/filialplaner-app/static/js/main.6c438648.js",
+    "main.js": "/filialplaner-app/static/js/main.abff721c.js",
     "index.html": "/filialplaner-app/index.html",
     "main.06c9089d.css.map": "/filialplaner-app/static/css/main.06c9089d.css.map",
-    "main.6c438648.js.map": "/filialplaner-app/static/js/main.6c438648.js.map"
+    "main.abff721c.js.map": "/filialplaner-app/static/js/main.abff721c.js.map"
   },
   "entrypoints": [
     "static/css/main.06c9089d.css",
-    "static/js/main.6c438648.js"
+    "static/js/main.abff721c.js"
   ]
 }
